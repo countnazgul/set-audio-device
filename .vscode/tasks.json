@@ -1,0 +1,13 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build me",
+            "type": "shell",
+            "command": "go build -o ./build/set-audio-device.exe",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
