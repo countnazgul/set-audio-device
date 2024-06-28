@@ -6,37 +6,63 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/gen2brain/beeep"
 	"github.com/go-ole/go-ole"
 	"github.com/moutend/go-wca/pkg/wca"
 )
 
 func main() {
+	err := ole.CoInitializeEx(0, ole.COINIT_APARTMENTTHREADED)
+	if err != nil {
+		panic(err)
+	}
+
 	args := os.Args
 
 	if len(args) == 1 {
 		listDevices()
+		defer ole.CoUninitialize()
 		os.Exit(0)
 	}
 
 	if len(args) == 2 {
 		setAudioDeviceByID(args[1])
+		defer ole.CoUninitialize()
 		os.Exit(0)
 	}
 
 	fmt.Printf("Too many arguments! Please provide only one")
+	defer ole.CoUninitialize()
+
 	os.Exit(1)
 }
 
 func listDevices() {
-	err := ole.CoInitializeEx(0, ole.COINIT_APARTMENTTHREADED)
-	if err != nil {
-		panic(err)
+	devices := getAllDevices()
+
+	for k, v := range devices {
+		fmt.Printf("%s\n\t%s\n\n", k, v)
 	}
-	defer ole.CoUninitialize()
+}
+
+func getDeviceName(deviceID string) string {
+	devices := getAllDevices()
+	deviceName := ""
+
+	for k, v := range devices {
+		if k == deviceID {
+			deviceName = v
+		}
+	}
+
+	return deviceName
+}
+
+func getAllDevices() map[string]string {
 
 	var mmde *wca.IMMDeviceEnumerator
 
-	if err = wca.CoCreateInstance(
+	if err := wca.CoCreateInstance(
 		wca.CLSID_MMDeviceEnumerator,
 		0,
 		wca.CLSCTX_ALL,
@@ -49,7 +75,7 @@ func listDevices() {
 	defer mmde.Release()
 
 	var devicesCollection *wca.IMMDeviceCollection
-	if err = mmde.EnumAudioEndpoints(wca.ERender, wca.DEVICE_STATE_ACTIVE, &devicesCollection); err != nil {
+	if err := mmde.EnumAudioEndpoints(wca.ERender, wca.DEVICE_STATE_ACTIVE, &devicesCollection); err != nil {
 		panic(err)
 	}
 
@@ -58,9 +84,11 @@ func listDevices() {
 
 	defer devicesCollection.Release()
 
+	myDict := make(map[string]string)
+
 	for i := uint32(0); i < (devicesCount); i++ {
 		var mmd *wca.IMMDevice
-		if err = devicesCollection.Item(i, &mmd); err != nil {
+		if err := devicesCollection.Item(i, &mmd); err != nil {
 			panic(err)
 		}
 
@@ -70,18 +98,20 @@ func listDevices() {
 		defer mmd.Release()
 
 		var ps *wca.IPropertyStore
-		if err = mmd.OpenPropertyStore(wca.STGM_READ, &ps); err != nil {
+		if err := mmd.OpenPropertyStore(wca.STGM_READ, &ps); err != nil {
 			panic(err)
 		}
 		defer ps.Release()
 
 		var pv wca.PROPVARIANT
-		if err = ps.GetValue(&wca.PKEY_Device_FriendlyName, &pv); err != nil {
+		if err := ps.GetValue(&wca.PKEY_Device_FriendlyName, &pv); err != nil {
 			panic(err)
 		}
 
-		fmt.Printf("%s\n\t%s\n\n", pv.String(), deviceId)
+		myDict[deviceId] = pv.String()
 	}
+
+	return myDict
 }
 
 type IPolicyConfigVista struct {
@@ -134,11 +164,6 @@ func setAudioDeviceByID(deviceID string) {
 	GUID_CPolicyConfigVistaClient := ole.NewGUID("{294935CE-F637-4E7C-A41B-AB255460B862}")
 	var policyConfig *IPolicyConfigVista
 
-	if err := ole.CoInitializeEx(0, ole.COINIT_APARTMENTTHREADED); err != nil {
-		panic(err)
-	}
-	defer ole.CoUninitialize()
-
 	if err := wca.CoCreateInstance(
 		GUID_CPolicyConfigVistaClient,
 		0,
@@ -151,6 +176,17 @@ func setAudioDeviceByID(deviceID string) {
 	defer policyConfig.Release()
 
 	if err := policyConfig.SetDefaultEndpoint(deviceID, wca.EConsole); err != nil {
+		panic(err)
+	}
+
+	deviceName := getDeviceName(deviceID)
+
+	err := beeep.Notify(
+		"Audio device changed",
+		deviceName,
+		"assets/audio-speaker.png",
+	)
+	if err != nil {
 		panic(err)
 	}
 }
