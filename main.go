@@ -18,7 +18,6 @@ func main() {
 	}
 
 	args := os.Args
-
 	if len(args) == 1 {
 		listDevices()
 		defer ole.CoUninitialize()
@@ -26,7 +25,12 @@ func main() {
 	}
 
 	if len(args) == 2 {
-		setAudioDeviceByID(args[1])
+		if args[1] == "current" {
+			printCurrentDevice()
+		} else {
+			setAudioDeviceByID(args[1])
+		}
+
 		defer ole.CoUninitialize()
 		os.Exit(0)
 	}
@@ -183,6 +187,44 @@ func setAudioDeviceByID(deviceID string) {
 
 	err := beeep.Notify(
 		"Audio device changed",
+		deviceName,
+		"assets/audio-speaker.png",
+	)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func printCurrentDevice() {
+	var mmde *wca.IMMDeviceEnumerator
+	if err := wca.CoCreateInstance(wca.CLSID_MMDeviceEnumerator, 0, wca.CLSCTX_ALL, wca.IID_IMMDeviceEnumerator, &mmde); err != nil {
+		return
+	}
+	defer mmde.Release()
+
+	var mmd *wca.IMMDevice
+	if err := mmde.GetDefaultAudioEndpoint(wca.ERender, wca.EConsole, &mmd); err != nil {
+		return
+	}
+	defer mmd.Release()
+
+	var ps *wca.IPropertyStore
+	if err := mmd.OpenPropertyStore(wca.STGM_READ, &ps); err != nil {
+		return
+	}
+	defer ps.Release()
+
+	var pv wca.PROPVARIANT
+	if err := ps.GetValue(&wca.PKEY_Device_FriendlyName, &pv); err != nil {
+		return
+	}
+
+	var deviceName = pv.String()
+
+	fmt.Printf("%s", deviceName)
+
+	err := beeep.Notify(
+		"Current audio device",
 		deviceName,
 		"assets/audio-speaker.png",
 	)

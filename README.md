@@ -20,6 +20,14 @@ The app accepts only one argument - device id (see above to get the list of the 
 
 (No confirmations are given. If the provided ID do not exists the ... nothing is going to happen)
 
+## Print current device
+
+Just to print the current active audio device
+
+```shell
+.\set-audio-device.exe current
+```
+
 ## PowerToys
 
 - start `PowerToys`
@@ -38,6 +46,7 @@ The app accepts only one argument - device id (see above to get the list of the 
   - `Visibility` - `Hidden`
 
     ![PowerToys config](./assets/PT-config.png)
+
   - press `OK`
 
 You can setup as many of these shortcuts as you want.

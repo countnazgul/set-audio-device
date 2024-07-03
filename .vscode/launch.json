@@ -22,6 +22,16 @@
             ]
         },
         {
+            "name": "Print current audio device",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "main.go",
+            "args": [
+                "current"
+            ]
+        },
+        {
             "name": "Set device (speaker)",
             "type": "go",
             "request": "launch",
