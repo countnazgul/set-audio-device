@@ -18,7 +18,30 @@
             "mode": "auto",
             "program": "main.go",
             "args": [
+                "set",
                 "{0.0.0.00000000}.{e1cb3655-eddf-441d-b736-15681d93d28f}"
+            ]
+        },
+        {
+            "name": "Set device (speaker)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "main.go",
+            "args": [
+                "set",
+                "{0.0.0.00000000}.{2cf0806a-b359-4cb2-8324-739f79e9bc5b}"
+            ]
+        },
+        {
+            "name": "Set device (missing)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "main.go",
+            "args": [
+                "set",
+                "ABCD"
             ]
         },
         {
@@ -32,26 +55,6 @@
             ]
         },
         {
-            "name": "Set device (speaker)",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "main.go",
-            "args": [
-                "{0.0.0.00000000}.{2cf0806a-b359-4cb2-8324-739f79e9bc5b}"
-            ]
-        },
-        {
-            "name": "Set device (missing)",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "main.go",
-            "args": [
-                "ABCD"
-            ]
-        },
-        {
             "name": "Too many arguments",
             "type": "go",
             "request": "launch",
@@ -59,7 +62,9 @@
             "program": "main.go",
             "args": [
                 "1",
-                "2"
+                "2",
+                "3",
+                "4"
             ]
         }
     ]

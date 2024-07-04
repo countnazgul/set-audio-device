@@ -28,24 +28,50 @@ func main() {
 		if args[1] == "current" {
 			printCurrentDevice()
 		} else {
-			setAudioDeviceByID(args[1])
-		}
+			fmt.Printf("Unknown argument %s", args[1])
 
-		defer ole.CoUninitialize()
-		os.Exit(0)
+			defer ole.CoUninitialize()
+			os.Exit(0)
+		}
 	}
 
-	fmt.Printf("Too many arguments! Please provide only one")
-	defer ole.CoUninitialize()
+	if len(args) == 3 {
+		if args[1] == "set" {
+			deviceName := getDeviceName(args[2])
 
+			if deviceName == "" {
+				fmt.Printf("Device with ID \"%s\" was not found", args[2])
+				defer ole.CoUninitialize()
+				os.Exit(0)
+			}
+
+			setAudioDeviceByID(args[2])
+			fmt.Printf("Current audio device setÁ to \"%s\"", deviceName)
+
+			defer ole.CoUninitialize()
+			os.Exit(0)
+		} else {
+			fmt.Printf("Unknown argument %s", args[1])
+
+			defer ole.CoUninitialize()
+			os.Exit(0)
+		}
+	}
+
+	fmt.Printf("Too many arguments!")
+
+	defer ole.CoUninitialize()
 	os.Exit(1)
 }
 
 func listDevices() {
 	devices := getAllDevices()
+	fmt.Printf("Total devices: %d\n---\n", len(devices))
 
+	i := 0
 	for k, v := range devices {
-		fmt.Printf("%s\n\t%s\n\n", k, v)
+		fmt.Printf("ID     %s\nName   %s\nIndex  %d\n\n", k, v, i)
+		i++
 	}
 }
 

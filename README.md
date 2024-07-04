@@ -15,7 +15,7 @@ Starting the app without any arguments will list the available active audio devi
 The app accepts only one argument - device id (see above to get the list of the available devices and their ids)
 
 ```shell
-.\set-audio-device.exe "{0.0.0.00000000}.{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"
+.\set-audio-device.exe set "{0.0.0.00000000}.{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"
 ```
 
 (No confirmations are given. If the provided ID do not exists the ... nothing is going to happen)
@@ -39,7 +39,7 @@ Just to print the current active audio device
 
   - `Action` - `Run program`
   - `App` - the full path to `set-audio-device.exe`
-  - `Args` - single device ID here. In format `{0.0.0.00000000}.{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`
+  - `Args` - single device ID here. In format `set {0.0.0.00000000}.{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`
   - `Start in` - (not sure its needed but ...) the folder where `set-audio-device.exe` is located
   - `Elevation` - `Normal`
   - `If running` - `Close`
